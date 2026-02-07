@@ -13,7 +13,9 @@
     <artifactId>server</artifactId>
     <packaging>jar</packaging>
 
-    <name>Explore-With-Me Main Service</name>
+    <name>Explore-With-Me Stats Service</name>
+
+
 
     <dependencies>
         <dependency>
@@ -52,12 +54,6 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>dto</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ru.practicum</groupId>

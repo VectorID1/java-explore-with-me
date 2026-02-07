@@ -15,9 +15,7 @@
 	<modules>
 		<module>main-server</module>
 		<module>stats</module>
-		<module>stats/server</module>
-		<module>stats/dto</module>
-		<module>stats/client</module>
+
 	</modules>
 
 	<groupId>ru.practicum</groupId>

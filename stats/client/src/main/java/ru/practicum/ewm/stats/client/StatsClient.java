@@ -1,6 +1,7 @@
 package ru.practicum.ewm.stats.client;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 import ru.practicum.ewm.stats.dto.HitDto;
 import ru.practicum.ewm.stats.dto.StatsDto;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class StatsClient extends BaseClient {
 
     private final String serverUrl;

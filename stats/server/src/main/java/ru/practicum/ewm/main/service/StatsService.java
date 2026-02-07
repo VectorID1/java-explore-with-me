@@ -3,7 +3,6 @@ package ru.practicum.ewm.main.service;
 import ru.practicum.ewm.stats.dto.HitDto;
 import ru.practicum.ewm.stats.dto.StatsDto;
 import ru.practicum.ewm.main.mapper.HitMapper;
-import ru.practicum.ewm.main.mapper.StatsMapper;
 import ru.practicum.ewm.main.model.Hit;
 import ru.practicum.ewm.main.repository.StatsRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,16 +31,13 @@ public class StatsService {
     }
 
     public List<StatsDto> getStats(LocalDateTime start, LocalDateTime end,
-                                   List<String> uris, boolean unique) {
+                                   List<String> uris, Boolean unique) {
 
-        List<Object[]> results;
-        if (unique) {
-            results = statsRepository.getStatsUniqueData(start, end, uris);
+        if (unique != null && unique) {
+            return  statsRepository.getStatsWithUniqueIp(start, end, uris);
         } else {
-            results = statsRepository.getStatsData(start, end, uris);
+            return  statsRepository.getStats(start, end, uris);
         }
-
-        return StatsMapper.toStatsDtoList(results);
     }
 
 }
