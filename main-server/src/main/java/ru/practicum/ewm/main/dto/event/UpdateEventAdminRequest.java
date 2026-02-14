@@ -30,7 +30,7 @@ public class UpdateEventAdminRequest {
     private Long categoryId;
 
     @Future(message = "Дата события должна быть в будущем")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private Location location;

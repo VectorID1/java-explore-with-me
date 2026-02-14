@@ -30,7 +30,7 @@ public class NewEventDto {
 
     @NotNull(message = "Дата события обязательна")
     @Future(message = "Дата события должна быть в будущем")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     @NotNull(message = "Локация обязательна")
