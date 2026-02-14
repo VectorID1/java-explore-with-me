@@ -22,7 +22,7 @@ public class NewEventDto {
 
     @NotNull(message = "Категория обязательна")
     @Positive(message = "ID категории должен быть положительным")
-    private Long categoryId;
+    private Long category;
 
     @NotBlank(message = "Описание не может быть пустым")
     @Size(min = 20, max = 7000, message = "Описание должно быть от 20 до 7000 символов")
@@ -30,21 +30,18 @@ public class NewEventDto {
 
     @NotNull(message = "Дата события обязательна")
     @Future(message = "Дата события должна быть в будущем")
-  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     @NotNull(message = "Локация обязательна")
     private Location location;
 
-    @NotNull(message = "Поле paid обязательно")
-    private Boolean paid;
+    private String paid = "false";
 
-    @NotNull(message = "Лимит участников обязателен")
     @PositiveOrZero(message = "Лимит участников не может быть отрицательным")
-    private Integer participantLimit;
+    private String participantLimit = "0";
 
-    @NotNull(message = "Поле requestModeration обязательно")
-    private Boolean requestModeration;
+    private String requestModeration = "true";
 
     @NotBlank(message = "Заголовок не может быть пустым")
     @Size(min = 3, max = 120, message = "Заголовок должен быть от 3 до 120 символов")

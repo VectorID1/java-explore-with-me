@@ -1,7 +1,6 @@
 package ru.practicum.ewm.main.controller.adminController;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ public class AdminUserController {
     public List<UserDto> getUsers(
             @RequestParam(required = false) List<Long> ids,
             @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+            @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.info("GET /admin/users - получение пользователей ids={}, from={}, size={}", ids, from, size);
         return userService.getUsers(ids, from, size);
     }

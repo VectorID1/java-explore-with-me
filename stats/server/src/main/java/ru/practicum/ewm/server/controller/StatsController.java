@@ -1,10 +1,11 @@
-package ru.practicum.ewm.main.controller;
+package ru.practicum.ewm.server.controller;
 
 
 import jakarta.validation.Valid;
+import ru.practicum.ewm.server.exception.BadRequestException;
 import ru.practicum.ewm.stats.dto.HitDto;
 import ru.practicum.ewm.stats.dto.StatsDto;
-import ru.practicum.ewm.main.service.StatsService;
+import ru.practicum.ewm.server.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +39,13 @@ public class StatsController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") Boolean unique) {
+
+        if (start == null || end == null) {
+            throw new BadRequestException("start и end не указаны");
+        }
+        if (start.isAfter(end)) {
+            throw new BadRequestException("start должно быть раньше end");
+        }
 
         log.info("Получен запрос на статистику: start={}, end={}, uris={}, unique={}",
                 start, end, uris, unique);

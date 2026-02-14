@@ -3,6 +3,7 @@ package ru.practicum.ewm.main.dto.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,11 +31,13 @@ public class UpdateEventAdminRequest {
     private Long categoryId;
 
     @Future(message = "Дата события должна быть в будущем")
-  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private Location location;
     private Boolean paid;
+
+    @PositiveOrZero(message = "Лимит участников не может быть отрицательным")
     private Integer participantLimit;
     private Boolean requestModeration;
 

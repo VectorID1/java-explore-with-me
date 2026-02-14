@@ -1,6 +1,6 @@
-package ru.practicum.ewm.main.repository;
+package ru.practicum.ewm.server.repository;
 
-import ru.practicum.ewm.main.model.Hit;
+import ru.practicum.ewm.server.model.Hit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

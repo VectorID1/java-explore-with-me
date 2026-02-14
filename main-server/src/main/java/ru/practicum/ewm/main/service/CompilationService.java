@@ -30,6 +30,10 @@ public class CompilationService {
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
 
+        if (newCompilationDto.getPinned() != null) {
+            compilation.setPinned(Boolean.parseBoolean(newCompilationDto.getPinned()));
+        }
+
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             List<Event> events = eventService.getEventsByIds(newCompilationDto.getEvents());
             compilation.setEvents(events);
@@ -85,7 +89,13 @@ public class CompilationService {
     public CompilationDto updateCompilation(Long compId, UpdateCompilationDto dto) {
         Compilation compilation = getCompilationById(compId);
 
-        CompilationMapper.updateCompilation(compilation, dto);
+        if (dto.getTitle() != null) {
+            compilation.setTitle(dto.getTitle());
+        }
+
+        if (dto.getPinned() != null) {
+            compilation.setPinned(Boolean.parseBoolean(dto.getPinned()));
+        }
 
         if (dto.getEvents() != null) {
             List<Event> events = eventService.getEventsByIds(dto.getEvents());

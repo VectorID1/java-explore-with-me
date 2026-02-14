@@ -1,10 +1,10 @@
-package ru.practicum.ewm.main.service;
+package ru.practicum.ewm.server.service;
 
 import ru.practicum.ewm.stats.dto.HitDto;
 import ru.practicum.ewm.stats.dto.StatsDto;
-import ru.practicum.ewm.main.mapper.HitMapper;
-import ru.practicum.ewm.main.model.Hit;
-import ru.practicum.ewm.main.repository.StatsRepository;
+import ru.practicum.ewm.server.mapper.HitMapper;
+import ru.practicum.ewm.server.model.Hit;
+import ru.practicum.ewm.server.repository.StatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

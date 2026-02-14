@@ -46,15 +46,30 @@ public class EventService {
         validateEventDate(newEventDto.getEventDate());
 
         User initiator = userService.getUserEntity(userId);
-        Category category = categoryService.getCategoryEntity(newEventDto.getCategoryId());
-
+        Category category = categoryService.getCategoryEntity(newEventDto.getCategory());
 
         Event event = EventMapper.toEvent(newEventDto);
         event.setInitiator(initiator);
         event.setCategory(category);
+
+        if (newEventDto.getPaid() != null) {
+            event.setPaid(Boolean.parseBoolean(newEventDto.getPaid()));
+        }
+
+        if (newEventDto.getParticipantLimit() != null) {
+            try {
+                event.setParticipantLimit(Integer.parseInt(newEventDto.getParticipantLimit()));
+            } catch (NumberFormatException e) {
+                event.setParticipantLimit(0);
+            }
+        }
+
+        if (newEventDto.getRequestModeration() != null) {
+            event.setRequestModeration(Boolean.parseBoolean(newEventDto.getRequestModeration()));
+        }
+
         event.setState(EventState.PENDING);
         event.setCreatedOn(LocalDateTime.now());
-
 
         event = eventRepository.save(event);
 
@@ -158,7 +173,7 @@ public class EventService {
                 case "SEND_TO_REVIEW":
                     event.setState(EventState.PENDING);
                     break;
-                case "CANCEL":
+                case "CANCEL_REVIEW":
                     event.setState(EventState.CANCELED);
                     break;
                 default:
@@ -209,25 +224,6 @@ public class EventService {
         return EventMapper.toEventFullDto(event);
     }
 
-    @Transactional
-    public void incrementConfirmedRequests(Long eventId) {
-        Event event = getEventById(eventId);
-
-        if (event.getParticipantLimit() > 0) {
-            if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-                throw new ConflictException(
-                        "Достигнут лимит участников для события " + eventId + ". Максимум: " +
-                                event.getParticipantLimit());
-            }
-        }
-
-        event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-
-        log.info("Увеличен счетчик подтвержденных заявок для события {}: {}/{}",
-                eventId,
-                event.getConfirmedRequests(),
-                event.getParticipantLimit() == 0 ? "∞" : event.getParticipantLimit());
-    }
 
     public List<EventShortDto> getPublicEvents(
             String text,
@@ -237,9 +233,18 @@ public class EventService {
             LocalDateTime rangeEnd,
             Boolean onlyAvailable,
             String sort,
-            int from, int size) {
+            int from, int size,
+            HttpServletRequest request) {
 
         validateDateRange(rangeStart, rangeEnd);
+
+        HitDto hitDto = HitDto.builder()
+                .app("main")
+                .uri("/events")
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build();
+        statsClient.hit(hitDto);
 
         Pageable pageable = PageRequest.of(from / size, size);
 

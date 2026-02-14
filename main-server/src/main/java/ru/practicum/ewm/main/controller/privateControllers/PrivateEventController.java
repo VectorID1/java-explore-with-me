@@ -1,7 +1,6 @@
 package ru.practicum.ewm.main.controller.privateControllers;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class PrivateEventController {
     public List<EventShortDto> getUserEvents(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+            @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.info("GET /users/{userId}/events- получение списка события пользователя c Id: {}", userId);
 
         return eventService.getUserEvents(userId, from, size);

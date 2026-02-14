@@ -57,7 +57,7 @@ public class RequestService {
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
-            eventService.incrementConfirmedRequests(eventId);
+            incrementConfirmedRequests(event);
         }
 
         request = requestRepository.save(request);
@@ -146,7 +146,7 @@ public class RequestService {
                     throw new ConflictException("Можно подтверждать только заявки в статусе PENDING");
                 }
                 req.setStatus(RequestStatus.CONFIRMED);
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                incrementConfirmedRequests(event);
                 confirmed.add(RequestMapper.toParticipationRequestDto(req));
             }
         } else if ("REJECTED".equals(request.getStatus())) {
@@ -165,6 +165,24 @@ public class RequestService {
                 .confirmedRequests(confirmed)
                 .rejectedRequests(rejected)
                 .build();
+    }
+
+    public void incrementConfirmedRequests(Event event) {
+
+        if (event.getParticipantLimit() > 0) {
+            if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
+                throw new ConflictException(
+                        "Достигнут лимит участников для события " + event.getTitle() + ". Максимум: " +
+                                event.getParticipantLimit());
+            }
+        }
+
+        event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+
+        log.info("Увеличен счетчик подтвержденных заявок для события {}: {}/{}",
+                event.getId(),
+                event.getConfirmedRequests(),
+                event.getParticipantLimit() == 0 ? "∞" : event.getParticipantLimit());
     }
 
 

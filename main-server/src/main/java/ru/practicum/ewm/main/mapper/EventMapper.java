@@ -52,11 +52,6 @@ public class EventMapper {
                 .description(newEventDto.getDescription())
                 .eventDate(newEventDto.getEventDate())
                 .location(newEventDto.getLocation())
-                .paid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false)
-                .participantLimit(newEventDto.getParticipantLimit() != null ?
-                        newEventDto.getParticipantLimit() : 0)
-                .requestModeration(newEventDto.getRequestModeration() != null ?
-                        newEventDto.getRequestModeration() : true)
                 .build();
     }
 

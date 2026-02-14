@@ -1,4 +1,4 @@
-package ru.practicum.ewm.main.mapper;
+package ru.practicum.ewm.server.mapper;
 
 import ru.practicum.ewm.stats.dto.StatsDto;
 
