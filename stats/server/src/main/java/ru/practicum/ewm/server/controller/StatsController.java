@@ -26,7 +26,7 @@ public class StatsController {
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public void saveHit(@Valid @RequestBody HitDto hitDto) {
-        log.info("Получен запрос на сохранение hit: app={}, uri={}, ip={}, timestamp={}",
+        log.info("POST Получен запрос на сохранение hit: app={}, uri={}, ip={}, timestamp={}",
                 hitDto.getApp(), hitDto.getUri(),
                 hitDto.getIp(), hitDto.getTimestamp());
 
@@ -47,7 +47,7 @@ public class StatsController {
             throw new BadRequestException("start должно быть раньше end");
         }
 
-        log.info("Получен запрос на статистику: start={}, end={}, uris={}, unique={}",
+        log.info("GET Получен запрос на статистику: start={}, end={}, uris={}, unique={}",
                 start, end, uris, unique);
 
         return statsService.getStats(start, end, uris, unique);

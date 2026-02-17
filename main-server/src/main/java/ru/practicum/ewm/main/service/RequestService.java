@@ -9,6 +9,7 @@ import ru.practicum.ewm.main.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.main.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.main.exception.ConflictException;
 import ru.practicum.ewm.main.exception.NotFoundException;
+import ru.practicum.ewm.main.exception.ValidationException;
 import ru.practicum.ewm.main.mapper.RequestMapper;
 import ru.practicum.ewm.main.model.*;
 import ru.practicum.ewm.main.repository.RequestRepository;
@@ -135,7 +136,18 @@ public class RequestService {
         List<ParticipationRequestDto> confirmed = new ArrayList<>();
         List<ParticipationRequestDto> rejected = new ArrayList<>();
 
-        if ("CONFIRMED".equals(request.getStatus())) {
+        RequestStatus status;
+        try {
+            status = RequestStatus.valueOf(request.getStatus());
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Недопустимый статус: " + request.getStatus());
+        }
+
+        if (status != RequestStatus.CONFIRMED && status != RequestStatus.REJECTED) {
+            throw new ValidationException("Статус должен быть CONFIRMED или REJECTED");
+        }
+
+        if (RequestStatus.CONFIRMED == status) {
             int availableSlots = event.getParticipantLimit() - event.getConfirmedRequests();
             if (event.getParticipantLimit() > 0 && requests.size() > availableSlots) {
                 throw new ConflictException("Недостаточно свободных мест");
@@ -149,7 +161,7 @@ public class RequestService {
                 incrementConfirmedRequests(event);
                 confirmed.add(RequestMapper.toParticipationRequestDto(req));
             }
-        } else if ("REJECTED".equals(request.getStatus())) {
+        } else if (RequestStatus.REJECTED == status) {
             for (Request req : requests) {
                 if (req.getStatus() != RequestStatus.PENDING) {
                     throw new ConflictException("Можно отклонять только заявки в статусе PENDING");

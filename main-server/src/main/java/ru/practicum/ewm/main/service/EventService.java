@@ -13,10 +13,7 @@ import ru.practicum.ewm.main.exception.ConflictException;
 import ru.practicum.ewm.main.exception.NotFoundException;
 import ru.practicum.ewm.main.exception.ValidationException;
 import ru.practicum.ewm.main.mapper.EventMapper;
-import ru.practicum.ewm.main.model.Category;
-import ru.practicum.ewm.main.model.Event;
-import ru.practicum.ewm.main.model.EventState;
-import ru.practicum.ewm.main.model.User;
+import ru.practicum.ewm.main.model.*;
 import ru.practicum.ewm.main.repository.EventRepository;
 import ru.practicum.ewm.stats.client.StatsClient;
 import ru.practicum.ewm.stats.dto.HitDto;
@@ -169,11 +166,11 @@ public class EventService {
         updateEventFields(event, request);
 
         if (request.getStateAction() != null) {
-            switch (request.getStateAction()) {
-                case "SEND_TO_REVIEW":
+            switch (UserStateAction.valueOf(request.getStateAction())) {
+                case SEND_TO_REVIEW:
                     event.setState(EventState.PENDING);
                     break;
-                case "CANCEL_REVIEW":
+                case CANCEL_REVIEW:
                     event.setState(EventState.CANCELED);
                     break;
                 default:
@@ -192,8 +189,8 @@ public class EventService {
         Event event = getEventById(eventId);
 
         if (request.getStateAction() != null) {
-            switch (request.getStateAction()) {
-                case "PUBLISH_EVENT":
+            switch (AdminStateAction.valueOf(request.getStateAction())) {
+                case PUBLISH_EVENT:
                     if (event.getState() != EventState.PENDING) {
                         throw new ConflictException("Можно публиковать только события в состоянии PENDING");
                     }
@@ -204,7 +201,7 @@ public class EventService {
                     event.setPublishedOn(LocalDateTime.now());
                     break;
 
-                case "REJECT_EVENT":
+                case REJECT_EVENT:
                     if (event.getState() == EventState.PUBLISHED) {
                         throw new ConflictException("Нельзя отклонить опубликованное событие");
                     }
@@ -328,7 +325,6 @@ public class EventService {
         }
     }
 
-
     public Event getEventById(Long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
@@ -419,6 +415,5 @@ public class EventService {
             return 0L;
         }
     }
-
 
 }
