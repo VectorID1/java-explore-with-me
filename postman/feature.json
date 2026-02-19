@@ -8,615 +8,1187 @@
 	},
 	"item": [
 		{
-			"name": "SETUP",
-			"event": [
+			"name": "Post",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const owner = {\r",
-							"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
-							"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
-							"};\r",
-							"\r",
-							"pm.sendRequest({\r",
-							"    url: 'http://localhost:8080/admin/users',\r",
-							"    method: 'POST',\r",
-							"    header: {'Content-Type': 'application/json'},\r",
-							"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
-							"}, function (err, ownerRes) {\r",
-							"    if (err) {\r",
-							"        console.error('Error creating owner:', err);\r",
-							"        return;\r",
-							"    }\r",
-							"    const ownerId = ownerRes.json().id;\r",
-							"    pm.environment.set(\"ownerId\", ownerId);\r",
-							"    \r",
-							"    const commenter = {\r",
-							"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
-							"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
-							"    };\r",
-							"    \r",
-							"    pm.sendRequest({\r",
-							"        url: 'http://localhost:8080/admin/users',\r",
-							"        method: 'POST',\r",
-							"        header: {'Content-Type': 'application/json'},\r",
-							"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
-							"    }, function (err, commenterRes) {\r",
-							"        if (err) {\r",
-							"            console.error('Error creating commenter:', err);\r",
-							"            return;\r",
-							"        }\r",
-							"        const commenterId = commenterRes.json().id;\r",
-							"        pm.environment.set(\"commenterId\", commenterId);\r",
-							"        \r",
-							"        pm.sendRequest({\r",
-							"            url: 'http://localhost:8080/admin/categories',\r",
-							"            method: 'POST',\r",
-							"            header: {'Content-Type': 'application/json'},\r",
-							"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
-							"        }, function (err, catRes) {\r",
-							"            if (err) {\r",
-							"                console.error('Error creating category:', err);\r",
-							"                return;\r",
-							"            }\r",
-							"            const categoryId = catRes.json().id;\r",
-							"            pm.environment.set(\"categoryId\", categoryId);\r",
-							"            \r",
-							"            const event = {\r",
-							"                annotation: \"Test annotation for comments that is long enough 20 symbols...\",\r",
-							"                category: categoryId,\r",
-							"                description: \"Test description that is definitely more than twenty symbols long for validation\",\r",
-							"                eventDate: \"2026-12-31 15:00:00\",\r",
-							"                location: { lat: 55.7558, lon: 37.6173 },\r",
-							"                paid: false,\r",
-							"                participantLimit: 10,\r",
-							"                requestModeration: true,\r",
-							"                title: \"Event for Comments Test\"\r",
-							"            };\r",
-							"            \r",
-							"            \r",
-							"            pm.sendRequest({\r",
-							"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
-							"                method: 'POST',\r",
-							"                header: {'Content-Type': 'application/json'},\r",
-							"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
-							"            }, function (err, eventRes) {\r",
-							"                if (err) {\r",
-							"                    console.error('Error creating event:', err);\r",
-							"                    console.error('Response:', eventRes);\r",
-							"                    return;\r",
-							"                }\r",
-							"                \r",
-							"                const eventId = eventRes.json().id;\r",
-							"                pm.environment.set(\"eventId\", eventId);\r",
-							"                \r",
-							"                pm.sendRequest({\r",
-							"                    url: 'http://localhost:8080/admin/events/' + eventId,\r",
-							"                    method: 'PATCH',\r",
-							"                    header: {'Content-Type': 'application/json'},\r",
-							"                    body: {\r",
-							"                        mode: 'raw', \r",
-							"                        raw: JSON.stringify({ stateAction: \"PUBLISH_EVENT\" })\r",
-							"                    }\r",
-							"                }, function (err, publishRes) {\r",
-							"                    if (err) {\r",
-							"                        console.error('Error publishing event:', err);\r",
-							"                    } else {\r",
-							"                        console.log('Event published successfully');\r",
-							"                    }\r",
-							"                });\r",
-							"            });\r",
-							"        });\r",
-							"    });\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"events"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST create comment1",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Comment created successfully\", function () {\r",
-							"    const response = pm.response.json();\r",
-							"    \r",
-							"    pm.response.to.have.status(201);\r",
-							"    pm.expect(response).to.have.property(\"id\");\r",
-							"    pm.expect(response).to.have.property(\"text\");\r",
-							"    pm.expect(response).to.have.property(\"eventId\");\r",
-							"    pm.expect(response).to.have.property(\"authorId\");\r",
-							"    pm.expect(response).to.have.property(\"createdDate\");\r",
-							"    \r",
-							"    pm.environment.set(\"commentId1\", response.id);\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"text\": \"Отличное мероприятие от пользователя {{ownerId}}!\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/users/{{commenterId}}/events/{{eventId}}/comments",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{commenterId}}",
-						"events",
-						"{{eventId}}",
-						"comments"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST create comment2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Comment created successfully\", function () {\r",
-							"    const response = pm.response.json();\r",
-							"    \r",
-							"    pm.response.to.have.status(201);\r",
-							"    pm.expect(response).to.have.property(\"id\");\r",
-							"    pm.expect(response).to.have.property(\"text\");\r",
-							"    pm.expect(response).to.have.property(\"eventId\");\r",
-							"    pm.expect(response).to.have.property(\"authorId\");\r",
-							"    pm.expect(response).to.have.property(\"createdDate\");\r",
-							"    \r",
-							"    pm.environment.set(\"commentId2\", response.id);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"text\": \"Замечательное мероприятие от пользователя {{ownerId}}!\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/users/{{commenterId}}/events/{{eventId}}/comments",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{commenterId}}",
-						"events",
-						"{{eventId}}",
-						"comments"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET all comments",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
-							"pm.test(\"Список комментариев не пуст\", () => {\r",
-							"    const res = pm.response.json();\r",
-							"    pm.expect(res.length).to.be.at.least(1);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events/{{eventId}}/comments?from=0&size=10",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"events",
-						"{{eventId}}",
-						"comments"
-					],
-					"query": [
+					"name": "POST create comment",
+					"event": [
 						{
-							"key": "from",
-							"value": "0"
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"            });\r",
+									"        });\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
 						},
 						{
-							"key": "size",
-							"value": "10"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Comment created successfully\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    \r",
+									"    pm.response.to.have.status(201);\r",
+									"    pm.expect(response).to.have.property(\"id\");\r",
+									"    pm.expect(response).to.have.property(\"text\");\r",
+									"    pm.expect(response).to.have.property(\"eventId\");\r",
+									"    pm.expect(response).to.have.property(\"authorId\");\r",
+									"    pm.expect(response).to.have.property(\"createdDate\");\r",
+									"    \r",
+									"    pm.environment.set(\"commentId2\", response.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Отличное мероприятие от пользователя {{ownerId}}!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/events/{{eventId}}/comments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"events",
+								"{{eventId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GET cooment by id",
-			"event": [
+			"name": "Get",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
-							"pm.test(\"Комментарий получен\", () => {\r",
-							"    const res = pm.response.json();\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"events",
-						"{{eventId}}",
-						"comments",
-						"{{commentId2}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET all comment by commentaator",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
-							"pm.test(\"Комментарии пользователя получены\", () => {\r",
-							"    const res = pm.response.json();\r",
-							"    res.forEach(c => pm.expect(c.authorId).to.equal(parseInt(pm.environment.get(\"commenterId\"))));\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/users/{{commenterId}}/comments?from=0&size=10",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{commenterId}}",
-						"comments"
-					],
-					"query": [
+					"name": "GET all comments",
+					"event": [
 						{
-							"key": "from",
-							"value": "0"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Список комментариев не пуст\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.length).to.be.at.least(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
 						},
 						{
-							"key": "size",
-							"value": "10"
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "PATCH update comment",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
-							"pm.test(\"Текст обновился\", () => {\r",
-							"    const res = pm.response.json();\r",
-							"    pm.expect(res.text).to.equal(\"Обновленный текст комментария\");\r",
-							"    pm.expect(res.updatedDate).to.not.equal(res.createdDate);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n     \"text\": \"Обновленный текст комментария\" \r\n     }",
-					"options": {
-						"raw": {
-							"language": "json"
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments?from=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
+				{
+					"name": "GET cooment by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Комментарий получен\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{commenterId}}",
-						"comments",
-						"{{commentId1}}"
-					]
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all comment by commentaator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Комментарии пользователя получены\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    res.forEach(c => pm.expect(c.authorId).to.equal(parseInt(pm.environment.get(\"commenterId\"))));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments?from=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GET updated comment",
-			"event": [
+			"name": "Update",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
-							"pm.test(\"Текст действительно обновился\", () => {\r",
-							"    pm.expect(pm.response.json().text).to.equal(\"Обновленный текст комментария\");\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
+					"name": "PATCH update comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Текст обновился\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.text).to.equal(\"Обновленный текст комментария\");\r",
+									"    pm.expect(res.updatedDate).to.not.equal(res.createdDate);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"events",
-						"{{eventId}}",
-						"comments",
-						"{{commentId1}}"
-					]
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"text\": \"Обновленный текст комментария\" \r\n     }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET updated comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Текст действительно обновился\", () => {\r",
+									"    pm.expect(pm.response.json().text).to.equal(\"Обновленный текст комментария\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "DELETE comment",
-			"event": [
+			"name": "Delete by owner",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
+					"name": "DELETE comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{commenterId}}",
-						"comments",
-						"{{commentId1}}"
-					]
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET deleted comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GET deleted comment",
-			"event": [
+			"name": "Delete by admin",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
+					"name": "DELETE commnet by admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const owner = {\r",
+									"    name: \"Owner_\" + Math.random().toString(36).substring(7),\r",
+									"    email: \"owner_\" + Date.now() + \"@test.com\"\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'http://localhost:8080/admin/users',\r",
+									"    method: 'POST',\r",
+									"    header: {'Content-Type': 'application/json'},\r",
+									"    body: {mode: 'raw', raw: JSON.stringify(owner)}\r",
+									"}, function (err, ownerRes) {\r",
+									"    const ownerId = ownerRes.json().id;\r",
+									"    \r",
+									"    const commenter = {\r",
+									"        name: \"Commenter_\" + Math.random().toString(36).substring(7),\r",
+									"        email: \"commenter_\" + Date.now() + \"@test.com\"\r",
+									"    };\r",
+									"    \r",
+									"    pm.sendRequest({\r",
+									"        url: 'http://localhost:8080/admin/users',\r",
+									"        method: 'POST',\r",
+									"        header: {'Content-Type': 'application/json'},\r",
+									"        body: {mode: 'raw', raw: JSON.stringify(commenter)}\r",
+									"    }, function (err, commenterRes) {\r",
+									"        const commenterId = commenterRes.json().id;\r",
+									"        pm.environment.set(\"commenterId\", commenterId);\r",
+									"        \r",
+									"        pm.sendRequest({\r",
+									"            url: 'http://localhost:8080/admin/categories',\r",
+									"            method: 'POST',\r",
+									"            header: {'Content-Type': 'application/json'},\r",
+									"            body: {mode: 'raw', raw: JSON.stringify({ name: \"Category_\" + Date.now() })}\r",
+									"        }, function (err, catRes) {\r",
+									"            const categoryId = catRes.json().id;\r",
+									"            \r",
+									"            const event = {\r",
+									"                annotation: \"Test annotation for comments...\",\r",
+									"                category: categoryId,\r",
+									"                description: \"Test description......\",\r",
+									"                eventDate: \"2026-12-31 15:00:00\",\r",
+									"                location: { lat: 55.7558, lon: 37.6173 },\r",
+									"                paid: false,\r",
+									"                participantLimit: 10,\r",
+									"                requestModeration: true,\r",
+									"                title: \"Event for Comments\"\r",
+									"            };\r",
+									"            \r",
+									"            pm.sendRequest({\r",
+									"                url: 'http://localhost:8080/users/' + ownerId + '/events',\r",
+									"                method: 'POST',\r",
+									"                header: {'Content-Type': 'application/json'},\r",
+									"                body: {mode: 'raw', raw: JSON.stringify(event)}\r",
+									"            }, function (err, eventRes) {\r",
+									"                const eventId = eventRes.json().id;\r",
+									"                pm.environment.set(\"eventId\", eventId);\r",
+									"                \r",
+									"                pm.sendRequest({\r",
+									"                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                    method: 'POST',\r",
+									"                    header: {'Content-Type': 'application/json'},\r",
+									"                    body: {\r",
+									"                        mode: 'raw',\r",
+									"                        raw: JSON.stringify({ text: 'Первый комментарий' })\r",
+									"                    }\r",
+									"                }, function (err, res1) {\r",
+									"                    if (!err) {\r",
+									"                        pm.environment.set(\"commentId1\", res1.json().id);\r",
+									"                        \r",
+									"                        pm.sendRequest({\r",
+									"                            url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                            method: 'POST',\r",
+									"                            header: {'Content-Type': 'application/json'},\r",
+									"                            body: {\r",
+									"                                mode: 'raw',\r",
+									"                                raw: JSON.stringify({ text: 'Второй комментарий' })\r",
+									"                            }\r",
+									"                        }, function (err, res2) {\r",
+									"                            if (!err) {\r",
+									"                                pm.environment.set(\"commentId2\", res2.json().id);\r",
+									"                                \r",
+									"                                pm.sendRequest({\r",
+									"                                    url: 'http://localhost:8080/users/' + commenterId + '/events/' + eventId + '/comments',\r",
+									"                                    method: 'POST',\r",
+									"                                    header: {'Content-Type': 'application/json'},\r",
+									"                                    body: {\r",
+									"                                        mode: 'raw',\r",
+									"                                        raw: JSON.stringify({ text: 'Третий комментарий' })\r",
+									"                                    }\r",
+									"                                }, function (err, res3) {\r",
+									"                                    if (!err) {\r",
+									"                                        pm.environment.set(\"commentId3\", res3.json().id);\r",
+									"                                        console.log('Все 3 комментария созданы!');\r",
+									"                                    }\r",
+									"                                });\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }); \r",
+									"        });\r",
+									"    }); \r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"events",
-						"{{eventId}}",
-						"comments",
-						"{{commentId1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE commnet by admin",
-			"event": [
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/admin/comments/{{commentId2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"comments",
+								"{{commentId2}}"
+							]
+						}
+					},
+					"response": []
+				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/admin/comments/{{commentId2}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
+					"name": "GET deleted comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"admin",
-						"comments",
-						"{{commentId2}}"
-					]
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId2}}"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET deleted comment",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"events",
-						"{{eventId}}",
-						"comments",
-						"{{commentId2}}"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	]
 }

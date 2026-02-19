@@ -17,6 +17,8 @@ import ru.practicum.ewm.main.model.Comment;
 import ru.practicum.ewm.main.model.Event;
 import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.repository.CommentRepository;
+import ru.practicum.ewm.main.repository.EventRepository;
+import ru.practicum.ewm.main.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +34,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final EventService eventService;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     @Transactional
     public CommentResponseDto createComment(Long userId, Long eventId, NewCommentDto dto) {
@@ -77,7 +81,7 @@ public class CommentService {
     public List<CommentResponseDto> getUserComments(Long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("createdDate").descending());
 
-        userService.getUserEntity(userId);
+        checkUserExists(userId);
 
         List<Comment> comments = commentRepository.findByAuthorId(userId, pageable);
 
@@ -91,7 +95,7 @@ public class CommentService {
     public List<CommentResponseDto> getEventComments(Long eventId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("createdDate").descending());
 
-        eventService.getEventById(eventId);
+        checkEventExists(eventId);
 
         List<Comment> comments = commentRepository.findByEventId(eventId, pageable);
 
@@ -104,6 +108,9 @@ public class CommentService {
 
     public CommentResponseDto getComment(Long commentId) {
         Comment comment = getCommentById(commentId);
+
+        log.info("Получение комментариев c id={}", commentId);
+
         return CommentMapper.toCommentResponseDto(comment);
     }
 
@@ -117,6 +124,18 @@ public class CommentService {
     private Comment getCommentById(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Комментарий с id=" + commentId + " не найден"));
+    }
+
+    private void checkUserExists(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
+        }
+    }
+
+    private void checkEventExists(Long eventID) {
+        if (!eventRepository.existsById(eventID)) {
+            throw new NotFoundException("Событие с id = " + eventID + " не найдено");
+        }
     }
 
 }
