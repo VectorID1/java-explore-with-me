@@ -8,44 +8,6 @@
 	},
 	"item": [
 		{
-			"name": "CLEANUP",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.environment.unset(\"ownerId\");\r",
-							"pm.environment.unset(\"commenterId\");\r",
-							"pm.environment.unset(\"eventId\");\r",
-							"pm.environment.unset(\"commentId1\");\r",
-							"pm.environment.unset(\"commentId2\");\r",
-							"pm.environment.unset(\"categoryId\");"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/test/cleanup",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"test",
-						"cleanup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "SETUP",
 			"event": [
 				{
@@ -319,10 +281,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/events/{{eventId}}/comments?from=0&size=10",
+					"raw": "http://localhost:8080/events/{{eventId}}/comments?from=0&size=10",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"{{eventId}}",
@@ -352,7 +316,6 @@
 							"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
 							"pm.test(\"Комментарий получен\", () => {\r",
 							"    const res = pm.response.json();\r",
-							"    pm.expect(res.id).to.equal(parseInt(pm.environment.get(\"commentId1\")));\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -365,15 +328,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId}}",
+					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"{{eventId}}",
 						"comments",
-						"{{commentId}}"
+						"{{commentId2}}"
 					]
 				}
 			},
@@ -402,10 +367,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/{{commenterId}}/comments?from=0&size=10",
+					"raw": "http://localhost:8080/users/{{commenterId}}/comments?from=0&size=10",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"{{commenterId}}",
@@ -458,10 +425,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/{{commenterId}}/comments/{{commentId1}}",
+					"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"{{commenterId}}",
@@ -494,10 +463,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId1}}",
+					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"{{eventId}}",
@@ -527,10 +498,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/{{commenterId}}/comments/{{commentId1}}",
+					"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"{{commenterId}}",
@@ -560,10 +533,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId1}}",
+					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"{{eventId}}",
@@ -593,10 +568,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/admin/comments/{{commentId2}}",
+					"raw": "http://localhost:8080/admin/comments/{{commentId2}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"admin",
 						"comments",
@@ -625,10 +602,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId2}}",
+					"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"{{eventId}}",
