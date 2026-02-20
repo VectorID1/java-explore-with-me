@@ -17,6 +17,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -28,7 +29,8 @@
 									"event = await api.publishEvent(event.id);\r",
 									"\r",
 									"pm.environment.set(\"commenterId\", commenter.id);\r",
-									"pm.environment.set(\"eventId\", event.id);"
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -63,7 +65,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Отличное мероприятие от пользователя {{ownerId}}!\"\r\n}",
+							"raw": "{\r\n    \"text\": \"Отличное мероприятие от пользователя!\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -115,6 +117,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -131,7 +134,8 @@
 									"pm.environment.set(\"eventId\", event.id);\r",
 									"pm.environment.set(\"commentId1\", comment1.id);\r",
 									"pm.environment.set(\"commentId2\", comment2.id);\r",
-									"pm.environment.set(\"commentId3\", comment3.id);"
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -189,6 +193,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -205,7 +210,8 @@
 									"pm.environment.set(\"eventId\", event.id);\r",
 									"pm.environment.set(\"commentId1\", comment1.id);\r",
 									"pm.environment.set(\"commentId2\", comment2.id);\r",
-									"pm.environment.set(\"commentId3\", comment3.id);"
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -255,6 +261,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -271,7 +278,8 @@
 									"pm.environment.set(\"eventId\", event.id);\r",
 									"pm.environment.set(\"commentId1\", comment1.id);\r",
 									"pm.environment.set(\"commentId2\", comment2.id);\r",
-									"pm.environment.set(\"commentId3\", comment3.id);"
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -320,6 +328,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -333,7 +342,8 @@
 									"\r",
 									"pm.environment.set(\"commenterId\", commenter.id);\r",
 									"pm.environment.set(\"eventId\", event.id);\r",
-									"pm.environment.set(\"commentId1\", comment.id);"
+									"pm.environment.set(\"commentId1\", comment.id);\r",
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -447,26 +457,23 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const api = new API(pm, true);\r",
-									"const rnd = new RandomUtils();\r",
+									"(async function() {\r",
+									"    const api = new API(pm, true);\r",
+									"    const rnd = new RandomUtils();\r",
 									"\r",
-									"const owner = await api.addUser(rnd.getUser());\r",
-									"const commenter = await api.addUser(rnd.getUser());\r",
-									"const category = await api.addCategory(rnd.getCategory());\r",
-									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
-									"event = await api.publishEvent(event.id);\r",
+									"    const owner = await api.addUser(rnd.getUser());\r",
+									"    const commenter = await api.addUser(rnd.getUser());\r",
+									"    const category = await api.addCategory(rnd.getCategory());\r",
+									"    let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"    event = await api.publishEvent(event.id);\r",
 									"\r",
-									"const comment = await api.addComment(commenter.id, event.id, \"Комментарий для удаления\");\r",
+									"    const comment = await api.addComment(commenter.id, event.id, \"Комментарий для удаления\");\r",
 									"\r",
-									"pm.environment.set(\"commenterId\", commenter.id); \r",
-									"pm.environment.set(\"commentId1\", comment.id);    \r",
-									"pm.environment.set(\"eventId\", event.id);          \r",
+									"    pm.environment.set(\"commenterId\", commenter.id); \r",
+									"    pm.environment.set(\"commentId1\", comment.id);    \r",
+									"    pm.environment.set(\"eventId\", event.id);\r",
 									"\r",
-									"console.log('🗑️ Комментарий для удаления:', {\r",
-									"    commenterId: commenter.id,\r",
-									"    commentId: comment.id,\r",
-									"    eventId: event.id\r",
-									"});"
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -552,6 +559,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"(async function() {\r",
 									"const api = new API(pm, true);\r",
 									"const rnd = new RandomUtils();\r",
 									"\r",
@@ -566,10 +574,7 @@
 									"pm.environment.set(\"adminCommentId\", comment.id);\r",
 									"pm.environment.set(\"eventId\", event.id);\r",
 									"\r",
-									"console.log('👑 Комментарий для админа:', {\r",
-									"    commentId: comment.id,\r",
-									"    eventId: event.id\r",
-									"});"
+									"})();"
 								],
 								"type": "text/javascript",
 								"packages": {},
