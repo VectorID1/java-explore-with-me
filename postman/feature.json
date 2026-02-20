@@ -1,0 +1,844 @@
+{
+	"info": {
+		"_postman_id": "557ca9fb-18b3-4477-a5f1-2bb66ec0f5b7",
+		"name": "feature",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44949584",
+		"_collection_link": "https://lexa-9131838.postman.co/workspace/Lexa's-Workspace~a70b03c0-de98-40fe-8c41-91873b291dc5/collection/44949584-557ca9fb-18b3-4477-a5f1-2bb66ec0f5b7?action=share&source=collection_link&creator=44949584"
+	},
+	"item": [
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "POST create comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"pm.environment.set(\"commenterId\", commenter.id);\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Comment created successfully\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    \r",
+									"    pm.response.to.have.status(201);\r",
+									"    pm.expect(response).to.have.property(\"id\");\r",
+									"    pm.expect(response).to.have.property(\"text\");\r",
+									"    pm.expect(response).to.have.property(\"eventId\");\r",
+									"    pm.expect(response).to.have.property(\"authorId\");\r",
+									"    pm.expect(response).to.have.property(\"createdDate\");\r",
+									"    \r",
+									"    pm.environment.set(\"commentId2\", response.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Отличное мероприятие от пользователя!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/events/{{eventId}}/comments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"events",
+								"{{eventId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get",
+			"item": [
+				{
+					"name": "GET all comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Список комментариев не пуст\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.length).to.be.at.least(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"const comment1 = await api.addComment(commenter.id, event.id, \"Первый комментарий\");\r",
+									"const comment2 = await api.addComment(commenter.id, event.id, \"Второй комментарий\");\r",
+									"const comment3 = await api.addComment(commenter.id, event.id, \"Третий комментарий\");\r",
+									"\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"pm.environment.set(\"commentId1\", comment1.id);\r",
+									"pm.environment.set(\"commentId2\", comment2.id);\r",
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments?from=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET cooment by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Комментарий получен\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"const comment1 = await api.addComment(commenter.id, event.id, \"Первый комментарий\");\r",
+									"const comment2 = await api.addComment(commenter.id, event.id, \"Второй комментарий\");\r",
+									"const comment3 = await api.addComment(commenter.id, event.id, \"Третий комментарий\");\r",
+									"\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"pm.environment.set(\"commentId1\", comment1.id);\r",
+									"pm.environment.set(\"commentId2\", comment2.id);\r",
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all comment by commentaator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Комментарии пользователя получены\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    res.forEach(c => pm.expect(c.authorId).to.equal(parseInt(pm.environment.get(\"commenterId\"))));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"const comment1 = await api.addComment(commenter.id, event.id, \"Первый комментарий\");\r",
+									"const comment2 = await api.addComment(commenter.id, event.id, \"Второй комментарий\");\r",
+									"const comment3 = await api.addComment(commenter.id, event.id, \"Третий комментарий\");\r",
+									"\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"pm.environment.set(\"commentId1\", comment1.id);\r",
+									"pm.environment.set(\"commentId2\", comment2.id);\r",
+									"pm.environment.set(\"commentId3\", comment3.id);\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments?from=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update",
+			"item": [
+				{
+					"name": "PATCH update comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"const comment = await api.addComment(commenter.id, event.id, \"Комментарий для обновления\");\r",
+									"\r",
+									"pm.environment.set(\"commenterId\", commenter.id);\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"pm.environment.set(\"commentId1\", comment.id);\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Текст обновился\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.text).to.equal(\"Обновленный текст комментария\");\r",
+									"    pm.expect(res.updatedDate).to.not.equal(res.createdDate);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"text\": \"Обновленный текст комментария\" \r\n     }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET updated comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Текст действительно обновился\", () => {\r",
+									"    pm.expect(pm.response.json().text).to.equal(\"Обновленный текст комментария\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete by owner",
+			"item": [
+				{
+					"name": "DELETE comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"    const api = new API(pm, true);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    const owner = await api.addUser(rnd.getUser());\r",
+									"    const commenter = await api.addUser(rnd.getUser());\r",
+									"    const category = await api.addCategory(rnd.getCategory());\r",
+									"    let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"    event = await api.publishEvent(event.id);\r",
+									"\r",
+									"    const comment = await api.addComment(commenter.id, event.id, \"Комментарий для удаления\");\r",
+									"\r",
+									"    pm.environment.set(\"commenterId\", commenter.id); \r",
+									"    pm.environment.set(\"commentId1\", comment.id);    \r",
+									"    pm.environment.set(\"eventId\", event.id);\r",
+									"\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/{{commenterId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{{commenterId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET deleted comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{commentId1}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId1}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete by admin",
+			"item": [
+				{
+					"name": "DELETE commnet by admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 204\", () => pm.response.to.have.status(204));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"(async function() {\r",
+									"const api = new API(pm, true);\r",
+									"const rnd = new RandomUtils();\r",
+									"\r",
+									"const owner = await api.addUser(rnd.getUser());\r",
+									"const commenter = await api.addUser(rnd.getUser());\r",
+									"const category = await api.addCategory(rnd.getCategory());\r",
+									"let event = await api.addEvent(owner.id, rnd.getEvent(category.id));\r",
+									"event = await api.publishEvent(event.id);\r",
+									"\r",
+									"const comment = await api.addComment(commenter.id, event.id, \"Комментарий для админа\");\r",
+									"\r",
+									"pm.environment.set(\"adminCommentId\", comment.id);\r",
+									"pm.environment.set(\"eventId\", event.id);\r",
+									"\r",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/admin/comments/{{adminCommentId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"comments",
+								"{{adminCommentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET deleted comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус 404 - комментарий не найден\", () => pm.response.to.have.status(404));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/events/{{eventId}}/comments/{{adminCommentId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{adminCommentId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"API = class {\r",
+					"    constructor(postman, verbose = false, baseUrl = \"http://localhost:8080\") {\r",
+					"        this.baseUrl = baseUrl;\r",
+					"        this.pm = postman;\r",
+					"        this._verbose = verbose;\r",
+					"    }\r",
+					"\r",
+					"    async addUser(user, verbose=null) {\r",
+					"        return this.post(\"/admin/users\", user, \"Ошибка при добавлении нового пользователя: \", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async addCategory(category, verbose=null) {\r",
+					"        return this.post(\"/admin/categories\", category, \"Ошибка при добавлении новой категории: \", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async addEvent(userId, event, verbose=null) {\r",
+					"        return this.post(\"/users/\" + userId + \"/events\", event, \"Ошибка при добавлении нового события: \", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async addComment(userId, eventId, commentText, verbose=null) {\r",
+					"    const comment = { text: commentText };\r",
+					"    return this.post(`/users/`+ userId + `/events/` + eventId + `/comments`, comment, \"Ошибка при добавлении комментария: \", verbose);\r",
+					"}\r",
+					"\r",
+					"    async addCompilation(compilation, verbose=null) {\r",
+					"        return this.post(\"/admin/compilations\", compilation, \"Ошибка при добавлении новой подборки: \", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async publishParticipationRequest(eventId, userId, verbose=null) {\r",
+					"        return this.post('/users/' + userId + '/requests?eventId=' + eventId, null, \"Ошибка при добавлении нового запроса на участие в событии\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async publishEvent(eventId, verbose=null) {\r",
+					"        return this.patch('/admin/events/' + eventId, {stateAction: \"PUBLISH_EVENT\"}, \"Ошибка при публикации события\", verbose);\r",
+					"    }\r",
+					"    \r",
+					"    async rejectEvent(eventId, verbose=null) {\r",
+					"        return this.patch('/admin/events/' + eventId, {stateAction: \"REJECT_EVENT\"}, \"Ошибка при отмене события\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async acceptParticipationRequest(eventId, userId, reqId, verbose=null) {\r",
+					"        return this.patch('/users/' + userId + '/events/' + eventId + '/requests', {requestIds:[reqId], status: \"CONFIRMED\"}, \"Ошибка при принятии заявки на участие в событии\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async findCategory(catId, verbose=null) {\r",
+					"        return this.get('/categories/' + catId, null, \"Ошибка при поиске категории по id\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async findCompilation(compId, verbose=null) {\r",
+					"        return this.get('/compilations/' + compId, null, \"Ошибка при поиске подборки по id\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async findEvent(eventId, verbose=null) {\r",
+					"        return this.get('/events/' + eventId, null, \"Ошибка при поиске события по id\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async findUser(userId, verbose=null) {\r",
+					"        return this.get('/admin/users?ids=' + userId, null, \"Ошибка при поиске пользователя по id\", verbose);\r",
+					"    }\r",
+					"\r",
+					"    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null) {\r",
+					"        return this.sendRequest(\"POST\", path, body, errorText, verbose);\r",
+					"    }\r",
+					"\r",
+					"    async patch(path, body = null, errorText = \"Ошибка при выполнении patch-запроса: \", verbose=null) {\r",
+					"        return this.sendRequest(\"PATCH\", path, body, errorText, verbose);\r",
+					"    }\r",
+					"\r",
+					"    async get(path, body = null, errorText = \"Ошибка при выполнении get-запроса: \", verbose=null) {\r",
+					"        return this.sendRequest(\"GET\", path, body, errorText, verbose);\r",
+					"    }\r",
+					"    async sendRequest(method, path, body=null, errorText = \"Ошибка при выполнении запроса: \", verbose=null) {\r",
+					"        return new Promise((resolve, reject) => {\r",
+					"            verbose = verbose == null ? this._verbose : verbose;\r",
+					"            const request = {\r",
+					"                url: this.baseUrl + path,\r",
+					"                method: method,\r",
+					"                body: body == null ? \"\" : JSON.stringify(body),\r",
+					"                header: { \"Content-Type\": \"application/json\" },\r",
+					"            };\r",
+					"            if(verbose) {\r",
+					"                console.log(\"Отправляю запрос: \", request);\r",
+					"            }\r",
+					"\r",
+					"            try {\r",
+					"                this.pm.sendRequest(request, (error, response) => {\r",
+					"                    if(error || (response.code >= 400 && response.code <= 599)) {\r",
+					"                        let err = error ? error : JSON.stringify(response.json());\r",
+					"                        console.error(\"При выполнении запроса к серверу возникла ошика.\\n\", err,\r",
+					"                             \"\\nДля отладки проблемы повторите такой же запрос к вашей программе \" + \r",
+					"                             \"на локальном компьютере. Данные запроса:\\n\", JSON.stringify(request));\r",
+					"\r",
+					"                        reject(new Error(errorText + err));\r",
+					"                    }\r",
+					"                    if(verbose) {\r",
+					"                        console.log(\"Результат обработки запроса: код состояния - \", response.code, \", тело: \", response.json());\r",
+					"                    }\r",
+					"                    if (response.stream.length === 0){\r",
+					"                        reject(new Error('Отправлено пустое тело ответа'))\r",
+					"                    }else{\r",
+					"                        resolve(response.json());\r",
+					"                    }\r",
+					"                });\r",
+					"                \r",
+					"            } catch(err) {\r",
+					"                if(verbose) {\r",
+					"                    console.error(errorText, err);\r",
+					"                }\r",
+					"                return Promise.reject(err);\r",
+					"            }\r",
+					"        });\r",
+					"    }\r",
+					"};\r",
+					"\r",
+					"RandomUtils = class {\r",
+					"    constructor() {}\r",
+					"\r",
+					"    getUser() {\r",
+					"        return {\r",
+					"            name: pm.variables.replaceIn('{{$randomFullName}}'),\r",
+					"            email: pm.variables.replaceIn('{{$randomEmail}}')\r",
+					"        };\r",
+					"    }\r",
+					"\r",
+					"    getCategory() {\r",
+					"        return {\r",
+					"            name: pm.variables.replaceIn('{{$randomWord}}') + Math.floor(Math.random() * 10000 * Math.random()).toString()\r",
+					"        };\r",
+					"    }\r",
+					"\r",
+					"    getEvent(categoryId) {\r",
+					"        return {\r",
+					"            annotation: pm.variables.replaceIn('{{$randomLoremParagraph}}'),\r",
+					"            category: categoryId,\r",
+					"            description: pm.variables.replaceIn('{{$randomLoremParagraphs}}'),\r",
+					"            eventDate: this.getFutureDateTime(),\r",
+					"            location: {\r",
+					"                lat: parseFloat(pm.variables.replaceIn('{{$randomLatitude}}')),\r",
+					"                lon: parseFloat(pm.variables.replaceIn('{{$randomLongitude}}')),\r",
+					"            },\r",
+					"            paid: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
+					"            participantLimit: pm.variables.replaceIn('{{$randomInt}}'),\r",
+					"            requestModeration: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
+					"            title: pm.variables.replaceIn('{{$randomLoremSentence}}'),\r",
+					"        }\r",
+					"    }\r",
+					"\r",
+					"    getCompilation(...eventIds) {\r",
+					"        return {\r",
+					"            title: pm.variables.replaceIn('{{$randomLoremSentence}}').slice(0, 50),\r",
+					"            pinned: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
+					"            events: eventIds\r",
+					"        };\r",
+					"    }\r",
+					"\r",
+					"\r",
+					"    getFutureDateTime(hourShift = 5, minuteShift=0, yearShift=0) {\r",
+					"        let moment = require('moment');\r",
+					"\r",
+					"        let m = moment();\r",
+					"        m.add(hourShift, 'hour');\r",
+					"        m.add(minuteShift, 'minute');\r",
+					"        m.add(yearShift, 'year');\r",
+					"\r",
+					"        return m.format('YYYY-MM-DD HH:mm:ss');\r",
+					"    }\r",
+					"\r",
+					"    getWord(length = 1) {\r",
+					"        let result = '';\r",
+					"        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+					"        const charactersLength = characters.length;\r",
+					"        let counter = 0;\r",
+					"        while (counter < length) {\r",
+					"            result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
+					"            counter += 1;\r",
+					"        }\r",
+					"        return result;\r",
+					"    }\r",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

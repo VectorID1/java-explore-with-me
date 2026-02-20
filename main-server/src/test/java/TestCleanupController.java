@@ -1,4 +1,5 @@
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor
+@Profile("test")
 public class TestCleanupController {
 
     private final JdbcTemplate jdbcTemplate;
@@ -16,9 +18,12 @@ public class TestCleanupController {
     @DeleteMapping("/cleanup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cleanup() {
-        jdbcTemplate.execute("TRUNCATE TABLE users, categories, events, requests, compilations, compilation_events RESTART IDENTITY CASCADE");
+        jdbcTemplate.execute("TRUNCATE TABLE comments," +
+                " users, " +
+                "categories, " +
+                "events, requests," +
+                " compilations," +
+                " compilation_events " +
+                "RESTART IDENTITY CASCADE");
     }
-
-    //Пока сюда, на 3м задании, сделаю тесты для фичи и сделаю этот эндпоинт встроеным после тестов что бы чистил БД.
-    //Этот эндпоит вообще создавался для прогона тестов на Postman я смотрел реальные сохранения в БД после чего чистил =)
 }

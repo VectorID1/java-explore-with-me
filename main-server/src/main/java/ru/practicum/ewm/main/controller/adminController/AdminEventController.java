@@ -49,4 +49,5 @@ public class AdminEventController {
         log.info("PATCH /admin/events/ обновление администратором события с id = {}", eventId);
         return eventService.updateEventByAdmin(eventId, request);
     }
+
 }
